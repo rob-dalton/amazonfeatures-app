@@ -1,0 +1,23 @@
+{% extends "page_template.html" %}
+{% block content %}
+<div class="product">
+  <h2 class="title">
+	  {{ product_title  }}
+  </h2>
+  <div class="avg-rating section">
+    {{ avg_rating }}
+  </div>
+  <div class="ratings-dist section">
+    <h4>Ratings Distribution</h4>
+	  {{ ratings_dist }}
+  </div>
+  <div class="pos-features section">
+	<h4>Positive Features</h4>
+ 	{{ pos_features }}
+  </div>
+  <div class="neg-features section">
+	<h4>Negative Features </h4>
+	{{ neg_features }}
+  </div>
+</div>
+{% endblock %}
