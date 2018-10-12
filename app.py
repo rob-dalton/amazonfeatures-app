@@ -5,7 +5,6 @@ import requests
 import pandas as pd
 import numpy as np
 import pymongo as mdb
-import operator
 
 app = Flask(__name__)
 

@@ -1,9 +1,10 @@
 #!bin/bash
 # amazonfeatures setup intended for AWS EC2 Ubutu 14.04 instance
 
-# install non-python dependencies
+# install dependencies
 sudo apt-get update
 cat requirements.txt | xargs sudo apt-get install -y
+pip install -r pip_requirements.txt
 
 # get project and data
 git clone https://github.com/rob-dalton/amazonfeatures-app.git
