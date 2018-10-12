@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template, Markup, url_for
 import cPickle as pickle
 import json
-import socket
 import requests
 import pandas as pd
 import numpy as np
@@ -166,9 +165,8 @@ def product(asin):
 if __name__ == '__main__':
     # setup global vars
     conn = mdb.MongoClient()
-    db = conn.reviews
+    db = conn.app
     coll = db.products
-    my_port = 8080
-    my_ip = socket.gethostbyname(socket.gethostname())
+    my_port = 8000
 
-    app.run(host='0.0.0.0', port=my_port, debug=True)
+    app.run(host='127.0.0.1', port=my_port, debug=True)
