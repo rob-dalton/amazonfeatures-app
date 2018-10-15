@@ -1,8 +1,4 @@
-### App
-1. Install python dependencies. Easiest to just install anaconda2.
-2. Install MongoDB if not already installed.
-3. Create database <code>reviews</code>.
-4. Import cleaned JSON from S3 to local directory.
-4. Use functions in <code>loadJson.py</code> to load JSON files to database.
-5. Run <code>app.py</code>
+# Amazonfeatures App
+This repo contains the frontend Flask application for `amazonfeatures`. In order to run it, you must have a local MongoDB instance running with a `reviews` database containing processed reviews.
 
+For DB setup and review processing, please see here: [amazonfeatures-review-processing](https://github.com/rob-dalton/amazonfeatures-review-processing).
