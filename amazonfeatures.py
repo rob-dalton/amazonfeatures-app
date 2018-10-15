@@ -1,9 +1,5 @@
 from flask import Flask, request, render_template, Markup, url_for
-import cPickle as pickle
 import json
-import requests
-import pandas as pd
-import numpy as np
 import pymongo as mdb
 
 app = Flask(__name__)

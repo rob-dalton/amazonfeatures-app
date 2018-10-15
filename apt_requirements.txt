@@ -1,5 +1,0 @@
-git
-awscli
-nginx
-build-essential python-dev
-python-pip
