@@ -1,34 +1,54 @@
-from flask import Flask, request, render_template, Markup, url_for
+from flask import Flask, request, render_template, Markup, url_for, g
 import json
 import pymongo as mdb
 
 app = Flask(__name__)
 
-# helper function
 @app.context_processor
 def add_vars_to_context():
     return dict(site_title="Amazon Feature Extractor")
 
-# home page
+######################################
+# DATABASE                           #
+######################################
+
+def connect_db():
+    conn = mdb.MongoClient()
+    db = conn.app
+    coll = db.products
+    return (conn, coll)
+
+@app.before_request
+def before_request():
+    g.db_conn, g.db_coll = connect_db()
+
+@app.teardown_request
+def teardown_request(exception):
+    if hasattr(g, 'db_conn'):
+        g.db_conn.close()
+
+######################################
+# VIEWS                              #
+######################################
+
+# home
 @app.route('/')
 def index():
     return render_template('index.html',
                             page_title="Home")
 
-# search results page
+# search results
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     # create index
-    coll.create_index([("title", "text")])
+    g.db_coll.create_index([("title", "text")])
 
     # setup query
     query=request.form['queryText']
 
     # get search results
-    search_results = coll.find({'$text':{'$search':query}},
+    search_results = g.db_coll.find({'$text':{'$search':query}},
                                {'score': {'$meta': 'textScore'}})
-
-    # sort results
     search_results.sort([('score', {'$meta': 'textScore'})]).limit(15)
 
     # collect results
@@ -64,19 +84,17 @@ def search():
                             results=Markup(results_html)
                           )
 
-
-# product page
+# product
 @app.route('/product/<string:asin>')
 def product(asin):
     # setup vars
-    product = coll.find_one({'asin':asin})
+    product = g.db_coll.find_one({'asin':asin})
     title = product["title"]
 
     # get avg rating
     sum_ratings = sum([product["ratings"][key]*int(key) for key in product["ratings"]])
     count_ratings = sum([product["ratings"][key] for key in product["ratings"]])
     avg_rating = round(sum_ratings * 1.0 / count_ratings, 2)
-
 
     # get star image path
     rating_rounded = int(round(avg_rating * 2) * 5)
@@ -85,7 +103,6 @@ def product(asin):
 
     # build html for avg_ratings
     avg_rating_html = '<img class="stars" src="{}" /><div class="avg-rating">{}</div>'.format(star_path, avg_rating)
-
 
     # build html for ratings distribution
     dist_bars_html = ""
@@ -115,10 +132,8 @@ def product(asin):
                                              bar_width,
                                              bar_width)
 
-
     # add dist bars html
     ratings_dist_html = '<div class="dist-ratings">{}</div>'.format(dist_bars_html)
-
 
     # build html for posFeatures
     feature_html = '<div class="feature-row"><div class="feature">{}</div>' \
@@ -147,21 +162,15 @@ def product(asin):
             temp += feature_html.format(feature[0], rel_importance, rel_importance)
         negFeatures_html = '<div class="negFeatures">{}</div>'.format(temp.strip(", "))
 
-    return render_template('product.html',
-                           page_title=title,
-                           product_title=title,
-                           avg_rating=Markup(avg_rating_html),
-                           ratings_dist=Markup(ratings_dist_html),
-                           pos_features=Markup(posFeatures_html),
-                           neg_features=Markup(negFeatures_html)
-                          )
-
+    return render_template(
+        'product.html',
+        page_title=title,
+        product_title=title,
+        avg_rating=Markup(avg_rating_html),
+        ratings_dist=Markup(ratings_dist_html),
+        pos_features=Markup(posFeatures_html),
+        neg_features=Markup(negFeatures_html)
+    )
 
 if __name__ == '__main__':
-    # setup global vars
-    conn = mdb.MongoClient()
-    db = conn.app
-    coll = db.products
-    my_port = 8000
-
-    app.run(host='127.0.0.1', port=my_port, debug=True)
+    app.run(host='127.0.0.1', port=8000, debug=True)
