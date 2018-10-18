@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.context_processor
 def add_vars_to_context():
-    return dict(site_title="Amazon Feature Extractor")
+    return dict(site_title="AmazonFeatures")
 
 ######################################
 # DATABASE                           #
@@ -36,6 +36,29 @@ def teardown_request(exception):
 def index():
     return render_template('index.html',
                             page_title="Home")
+
+# about
+@app.route('/about')
+def about():
+    contents = """
+        <p>AmazonFeatures is a feature-based sentiment extractor. Using the text from over 83 million Amazon product reviews, it attempts to identify the most important positive and negative features for individual products.</p>
+        <p><b>Why?</b> Because product reviews contain valuable information, but reading through them can be time consuming and tedious. AmazonFeatures sifts through the noise and identifies the pros and cons of a product for you.<p>
+        <p>For more about how AmazonFeatures works, please <a href='https://amazonfeatures.robdalton.me/data' >see here</a>.</p>
+        <p>For more about Robert Dalton, please <a href='https://robdalton.me'>see here</a>.</p>
+   """
+    return render_template('page.html',
+                            page_title="About",
+                            contents=Markup(contents))
+
+# data
+@app.route('/data')
+def data():
+    contents = """
+
+    """
+    return render_template('page.html',
+                            page_title="Data",
+                            contents=Markup(contents))
 
 # search results
 @app.route('/search', methods=['GET', 'POST'])
